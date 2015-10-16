@@ -2,7 +2,7 @@ package cesarCipher;
 
 public class CesarCipher
 {
-	private static double[] frequencies =
+	private static double[] frenchFrequencies =
 		{7.636, //a
 		0.901, //b
 		3.26, //c
@@ -39,7 +39,9 @@ public class CesarCipher
 
 	public static int rankOfChar(char a)
 	{
-		return a - 'a';
+		if (isLowerCase(a))
+			return a - 'a';
+		return a - 'A';
 	}
 
 	public static char charOfRank(int r)
@@ -102,15 +104,81 @@ public class CesarCipher
 		return crypt(s, reverseKey(key));
 	}
 
+	public static int[] effectives(String s)
+	{
+		int[] effectifs = new int[26];
+		for (int i = 0 ; i < s.length() ; i++)
+		{
+			char letter = s.charAt(i); 
+			if (isALetter(letter))
+				effectifs[rankOfChar(letter)]++;
+		}
+		return effectifs;
+	}
+	
+	public static int nbLetters(String message)
+	{
+		int nb = 0;
+		for (int i = 0 ; i < message.length() ; i++)
+			if (isALetter(message.charAt(i)))
+				nb++;
+		return nb;
+	}
+	
+	
+	public static double[] frenchEffectives(String message)
+	{
+		double[] fe = new double[26];
+		double nb = nbLetters(message);
+		for (int i = 0 ; i < 26 ; i++)
+			fe[i] = frenchFrequencies[i] * nb / 100; 
+		return fe;
+	}
+	
+	public static double chiSquared(int[] observed, double[] theorical)
+	{
+		double sum = 0;
+		for (int i = 0 ; i < 26 ; i++)
+		{
+			double numerator = (observed[i] - theorical[i]);
+			numerator *= numerator;
+			sum += numerator / theorical[i];
+		}
+		return sum;
+	}
+	
 	public static void bruteForceBreak(String s)
 	{
+		double[] fe =  frenchEffectives(s);
 		for (int key = 1 ; key < 25 ; key++)
-			System.out.println("key = " + key + " : " + decrypt(s, key));
+		{
+			String dec = decrypt(s, key);
+			System.out.println("key = " + key + " , " +
+					"(chi2 = " + chiSquared(effectives(dec), fe) + ") :  "
+					+ dec );
+			
+		}
 	}
 
+	public static String stringOfIntTab(int[] tab)
+	{
+		String s = "";
+		for (int i = 0 ; i < tab.length ; i++)
+			s += charOfRank(i) + " : " + tab[i] + "\n";
+		return s;
+	}
+	
+	public static String stringOfDoubleTab(double[] tab)
+	{
+		String s = "";
+		for (int i = 0 ; i < tab.length ; i++)
+			s += charOfRank(i) + " : " + tab[i] + "\n";
+		return s;
+	}
+	
 	public static void main(String[] args)
 	{
-		String message = "J'aime la programmation.", 
+		String message = "Le calcul de la fréquence des lettres dans une langue est difficile et soumis à interprétation. On compte la fréquence des lettres d’un texte arbitrairement long, mais un certain nombre de paramètres influencent les résultats.", 
 				cipher = crypt(message, 6), 
 				result = decrypt(cipher, 6);
 		System.out.println(message);
