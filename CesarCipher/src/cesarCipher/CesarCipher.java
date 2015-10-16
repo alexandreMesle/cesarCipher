@@ -2,11 +2,36 @@ package cesarCipher;
 
 public class CesarCipher
 {
-	public static int intOfChar(char a)
-	{
-		return (int) a;
-	}
-
+	private static double[] frequencies =
+		{7.636, //a
+		0.901, //b
+		3.26, //c
+		3.669, //d
+		14.715, //e
+		1.066, //f
+		0.866, //g
+		0.737, //h
+		7.529, //i
+		0.545, //j
+		0.049, //k
+		5.456, //l
+		2.968, //m
+		7.095, //n
+		5.378, //o
+		3.021, //p
+		1.362, //q
+		6.553, //r
+		7.948, //s
+		7.244, //t
+		6.311, //u
+		1.628, //v
+		0.114, //w
+		0.387, //x
+		0.308, //y
+		0.136 //z
+		};
+		
+		
 	public static char charOfInt(int x)
 	{
 		return (char) x;
@@ -14,12 +39,12 @@ public class CesarCipher
 
 	public static int rankOfChar(char a)
 	{
-		return intOfChar(a) - intOfChar('a');
+		return a - 'a';
 	}
 
 	public static char charOfRank(int r)
 	{
-		return charOfInt(r + intOfChar('a'));
+		return charOfInt(r + 'a');
 	}
 
 	public static int reverseKey(int k)
@@ -35,7 +60,7 @@ public class CesarCipher
 	public static char lowerCase(char c)
 	{
 		if (isUpperCase(c))
-			return charOfInt(intOfChar(c) - intOfChar('A') + intOfChar('a'));
+			return charOfInt(c - 'A' + 'a');
 		return c;
 	}
 
