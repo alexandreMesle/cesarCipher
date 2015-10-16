@@ -150,7 +150,7 @@ public class CesarCipher
 	public static void bruteForceBreak(String s)
 	{
 		double[] fe =  frenchEffectives(s);
-		for (int key = 1 ; key < 25 ; key++)
+		for (int key = 1 ; key <= 25 ; key++)
 		{
 			String dec = decrypt(s, key);
 			System.out.println("key = " + key + " , " +
