@@ -181,12 +181,11 @@ public class CesarCipher
 	public static void main(String[] args)
 	{
 		Random r = new Random();
-		int key = r.nextInt(26);
 		String message = "Le calcul de la fréquence des lettres dans une langue est difficile et soumis à interprétation. On compte la fréquence des lettres d’un texte arbitrairement long, mais un certain nombre de paramètres influencent les résultats.", 
-				cipher = crypt(message, key); 
+				cipher = crypt(message, r.nextInt(26)); 
 		System.out.println("Ciphered message is : " + cipher);
-		int minKey = bruteForceBreak(cipher);
-		System.out.println("Key is : " + minKey);
-		System.out.println("Original message is : " + decrypt(cipher, minKey));
+		int key = bruteForceBreak(cipher);
+		System.out.println("Key is : " + key);
+		System.out.println("Original message is : " + decrypt(cipher, key));
 	}
 }
