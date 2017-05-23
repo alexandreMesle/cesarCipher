@@ -1,10 +1,10 @@
-package cesarCipher;
+package substitutionCipher;
 
-import java.util.Random;
-
-public class CesarCipher
+public class Util 
 {
-	private static double[] frenchFrequencies =
+	public final static double frenchIndexOfCoincidence = 0.0745;
+	
+	public final static double[] frenchFrequencies =
 		{	0.07636, //a
 			0.00901, //b
 			0.0326, //c
@@ -51,6 +51,15 @@ public class CesarCipher
 		return charOfInt(r + 'a');
 	}
 
+	public static String charOfRank(int[] r)
+	{
+		String s = "";
+		for (int i = 0 ; i < r.length ; i++)
+			s += charOfRank(r[i]);
+		return s;
+	}
+
+
 	public static int reverseKey(int k)
 	{
 		return 26 - k;
@@ -93,19 +102,15 @@ public class CesarCipher
 		return a;
 	}
 
-	public static String crypt(String s, int key)
+	public static int nbLetters(String message)
 	{
-		String res = "";
-		for (int i = 0; i < s.length(); i++)
-			res += crypt(s.charAt(i), key);
-		return res;
+		int nb = 0;
+		for (int i = 0 ; i < message.length() ; i++)
+			if (isALetter(message.charAt(i)))
+				nb++;
+		return nb;
 	}
-
-	public static String decrypt(String s, int key)
-	{
-		return crypt(s, reverseKey(key));
-	}
-
+	
 	public static int[] effectives(String s)
 	{
 		int[] effectifs = new int[26];
@@ -117,16 +122,6 @@ public class CesarCipher
 		}
 		return effectifs;
 	}
-	
-	public static int nbLetters(String message)
-	{
-		int nb = 0;
-		for (int i = 0 ; i < message.length() ; i++)
-			if (isALetter(message.charAt(i)))
-				nb++;
-		return nb;
-	}
-	
 	
 	public static double[] getFrenchEffectives(String message)
 	{
@@ -149,43 +144,43 @@ public class CesarCipher
 		return sum;
 	}
 	
-	public static int bruteForceBreak(String s)
+	public static double indexOfCoincidence(String cipher)
 	{
-		double[] frenchEffectives =  getFrenchEffectives(s);
-		int minKey = -1;
-		double minSquaredChi = -1;
-		for (int key = 0 ; key <= 25 ; key++)
-		{
-			String dec = decrypt(s, key);
-			double squaredChi = getSquaredChi(effectives(dec), frenchEffectives);
-			System.out.println("key = " + key + " , " +
-					"(chi2 = " + squaredChi  + ") :  "
-					+ dec );
-			if (minKey == -1 || squaredChi < minSquaredChi)
-			{
-				minSquaredChi = squaredChi;
-				minKey = key;
-			}
-		}
-		return minKey;
+		int[] effectives = Util.effectives(cipher);
+		return indexOfCoincidence(effectives);
 	}
+	
+	public static double indexOfCoincidence(int[] effectives)
+	{
+		int nb = 0;
+		double[] frequences = new double[26];
+		for(int i = 0 ; i < effectives.length ; i++)
+			nb += effectives[i];
+		for(int i = 0 ; i < effectives.length ; i++)
+			frequences[i] = (double)effectives[i] / nb;
+		return indexOfCoincidence(frequences, nb);
+	}	
 
-	public static String stringOfIntTab(int[] tab)
+	public static double indexOfCoincidence(double[] frequences, int nbLetters)
 	{
-		String s = "";
-		for (int i = 0 ; i < tab.length ; i++)
-			s += charOfRank(i) + " : " + tab[i] + "\n";
-		return s;
+		double sum = 0;
+		for (int i = 0 ; i < 26 ; i++)
+		{
+			double effective = frequences[i] * nbLetters; 
+			sum +=  effective / nbLetters 
+					* (effective - 1) / (nbLetters - 1); 
+		}
+		return sum;
 	}
-		
-	public static void main(String[] args)
+	
+	public static String[] split(String message, int cycle)
 	{
-		Random r = new Random();
-		String message = "Le calcul de la fréquence des lettres dans une langue est difficile et soumis à interprétation. On compte la fréquence des lettres d’un texte arbitrairement long, mais un certain nombre de paramètres influencent les résultats.", 
-				cipher = crypt(message, r.nextInt(26)); 
-		System.out.println("Ciphered message is : " + cipher);
-		int key = bruteForceBreak(cipher);
-		System.out.println("Key is : " + key);
-		System.out.println("Original message is : " + decrypt(cipher, key));
+		String[] messages = new String[cycle];
+		for (int i = 0 ; i < cycle ; i++)
+			messages[i] = "";
+		for (int i = 0 ; i < message.length() ; i++)
+			messages[i % cycle] += message.charAt(i);
+		return messages;
 	}
 }
+
